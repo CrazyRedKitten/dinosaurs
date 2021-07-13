@@ -1,6 +1,8 @@
-
     // Create Dino Constructor
 
+    const Creature = () => {
+
+    };
 
     // Create Dino Objects
 
