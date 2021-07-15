@@ -73,24 +73,33 @@ const dinos = [
         }
     ]
     
-    // Create Dino Constructor
-    
+    // Create creature constructor - parent class
     /**
-     * @description represents a dinosaur object
+     * @description represents a creature base object
      * @constructor
-     * @param {string} species - The species of the dinosaur. 
-     * @param {number} height - The height of the dinosaur in inches. 
-     * @param {number} weight - The weight of the dinosaur in lbs.  
-     * @param {string} diet - The diet of the dinosaur.
-     * @param {string} where - The place where dinosaur lived.
-     * @param {string} when - The time period in which dinosaur lived.
-     * @param {string} fact - The fact about dinosaur.
+     * @param {string} species - The species of the creature. 
+     * @param {number} height - The height of the creature in inches. 
+     * @param {number} weight - The weight of the creature in lbs.  
+     * @param {string} diet - The diet of the creature.
      */
-    function Dino(species, weight, height, diet, where, when, fact){
+    function Creature(species, height, weight, diet){
         this.species = species;
         this.height = height;
         this.weight = weight;
         this.diet = diet;
+    }
+    
+    // Create Dino Constructor
+    /**
+     * @description represents a dinosaur object
+     * @constructor
+     * @param {string} where - The place where dinosaur lived.
+     * @param {string} when - The time period in which dinosaur lived.
+     * @param {string} fact - The fact about dinosaur.
+     */
+    function Dino(species, height, weight, diet, where, when, fact){
+        Creature.call(this, species, height, weight, diet)
+
         this.where = where;
         this.when = when;
         this.fact = fact;
@@ -101,15 +110,25 @@ const dinos = [
      * @description An array which stores Dino Objects
      */
     const dinosArray = [];
-
     dinos.forEach(element => {
         const {species, weight, height, diet, where, when, fact} = element;
         dinosArray.push(new Dino(species, weight, height, diet, where, when, fact));
     })
 
-    // TODO: Create Human Object
-    const human = Object.assign({}, Dino);
-    // TODO: Use IIFE to get human data from form
+    // Create Human Object
+    // Use IIFE to get human data from form
+    const getHumanData = (function(){
+        const name = document.getElementById('name');
+        const feet = document.getElementById('feet');
+        const inches = document.getElementById('inches');
+        const weight = document.getElementById('weight');
+        const diet = document.getElementById('diet');
+
+        return function(){
+            const human = new Creature(name.value, (Number.parseInt(feet.value)* 12)+ Number.parseInt(inches.value), weight.value, diet.value);
+            return human;
+        }
+    })();
 
     // TODO: Create Dino Compare Method 1
     // NOTE: Weight in JSON file is in lbs, height in inches. 
@@ -123,19 +142,35 @@ const dinos = [
     // NOTE: Weight in JSON file is in lbs, height in inches.
 
 
-    // TODO: Generate Tiles for each Dino in Array
-  
-        // TODO: Add tiles to DOM
+    // Generate Tiles for each Dino in Array
+    const generateTiles = () => {
+        const grid = document.getElementById('grid');
+        const fragment = document.createDocumentFragment();
+        dinosArray.forEach(element => {
+            const card = document.createElement('div');
+            const h3 = document.createElement('h3');
+            const image = document.createElement('img');
+            image.src = `images/${String(element.species).toLowerCase()}.png`;
+            h3.textContent = element.species;
+            card.appendChild(h3);
+            card.appendChild(image);
+            card.classList.add('grid-item');
+            fragment.appendChild(card)
+        })
+        grid.appendChild(fragment);
+    }
+        // Add tiles to DOM
 
     // TODO: Remove form from screen
 
     //TODO: On button click, prepare and display infographic
     const button = document.getElementById("btn");
 
-    button.addEventListener('click', (function(){
-        const form = document.getElementById("dino-compare");
+    const prepareInfographic = () => {
+        const form = document.getElementById('dino-compare');
+        form.remove();
+        getHumanData();
+        generateTiles();
+    }
 
-        return function(){
-            form.parentNode.removeChild(form);
-        }
-    })());
+    button.addEventListener('click', prepareInfographic);
