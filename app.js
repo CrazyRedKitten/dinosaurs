@@ -129,6 +129,9 @@ const dinos = [
             return human;
         }
     })();
+    const generateHumanTile = (human) => {
+
+    }
 
     // TODO: Create Dino Compare Method 1
     // NOTE: Weight in JSON file is in lbs, height in inches. 
@@ -147,6 +150,7 @@ const dinos = [
         const grid = document.getElementById('grid');
         const fragment = document.createDocumentFragment();
         dinosArray.forEach(element => {
+            //TODO: Refactor to generateTile Function function
             const card = document.createElement('div');
             const h3 = document.createElement('h3');
             const image = document.createElement('img');
@@ -168,8 +172,7 @@ const dinos = [
 
     const prepareInfographic = () => {
         const form = document.getElementById('dino-compare');
-        form.remove();
-        getHumanData();
+        form.style.display = 'none';
         generateTiles();
     }
 
