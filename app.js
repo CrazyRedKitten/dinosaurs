@@ -98,7 +98,7 @@ const dinos = [
      * @param {string} fact - The fact about dinosaur.
      */
     function Dino(species, height, weight, diet, where, when, fact){
-        Creature.call(this, species, height, weight, diet)
+        Creature.call(this, species, height, weight, diet);
 
         this.where = where;
         this.when = when;
@@ -109,13 +109,25 @@ const dinos = [
     /**
      * @description An array which stores Dino Objects
      */
-    const dinosArray = [];
+    let dinosArray = [];
+
     dinos.forEach(element => {
         const {species, weight, height, diet, where, when, fact} = element;
         dinosArray.push(new Dino(species, weight, height, diet, where, when, fact));
     })
 
     // Create Human Object
+    /**
+     * @description represents ad Human object
+     * @constructor
+     * @param {string} species 
+     * @param {number} height 
+     * @param {number} weight 
+     * @param {string} diet 
+     */
+    function Human(species, height, weight, diet){
+        Creature.call(this, species, height, weight, diet);
+    }
     // Use IIFE to get human data from form
     const getHumanData = (function(){
         const name = document.getElementById('name');
@@ -125,13 +137,10 @@ const dinos = [
         const diet = document.getElementById('diet');
 
         return function(){
-            const human = new Creature(name.value, (Number.parseInt(feet.value)* 12)+ Number.parseInt(inches.value), weight.value, diet.value);
+            const human = new Human(name.value, (Number.parseInt(feet.value)* 12)+ Number.parseInt(inches.value), weight.value, diet.value);
             return human;
         }
     })();
-    const generateHumanTile = (human) => {
-
-    }
 
     // TODO: Create Dino Compare Method 1
     // NOTE: Weight in JSON file is in lbs, height in inches. 
@@ -145,34 +154,71 @@ const dinos = [
     // NOTE: Weight in JSON file is in lbs, height in inches.
 
 
+    /**
+     * @description creates a single tile.
+     * 
+     * @param {Object} creature An instance of a creature
+     */
+    const createTile = (creature) => {
+        const {species, fact} = creature; 
+        const isHuman = creature instanceof Human;
+
+        const card = document.createElement('div');
+        const h3 = document.createElement('h3');
+        const image = document.createElement('img');
+        const description = document.createElement('p');
+
+        /**
+         * @description returns creature name in lowercase. 
+         * Handles human name change.
+         * @returns {string} name - creature name
+         */
+        function imageName () {
+            const name =  isHuman ? "human" : String(species).toLowerCase();
+            return name;
+        };
+
+        image.src = `images/${imageName()}.png`;
+        h3.textContent = species;
+        description.textContent = fact;
+        card.appendChild(h3);
+        card.appendChild(image);
+        // Generate description only for dino
+        !isHuman && card.appendChild(description);
+        card.classList.add('grid-item');
+
+        return card;
+    }
+
     // Generate Tiles for each Dino in Array
+    /**
+     * @description Generate a tile grid
+     */
     const generateTiles = () => {
         const grid = document.getElementById('grid');
         const fragment = document.createDocumentFragment();
+        
+        const dinosFirstPart = dinosArray.slice(0,4);
+        dinosFirstPart.push(getHumanData());
+        const dinosSecondPart = dinosArray.slice(4);
+        dinosArray = dinosFirstPart.concat(dinosSecondPart);
+
         dinosArray.forEach(element => {
-            //TODO: Refactor to generateTile Function function
-            const card = document.createElement('div');
-            const h3 = document.createElement('h3');
-            const image = document.createElement('img');
-            image.src = `images/${String(element.species).toLowerCase()}.png`;
-            h3.textContent = element.species;
-            card.appendChild(h3);
-            card.appendChild(image);
-            card.classList.add('grid-item');
-            fragment.appendChild(card)
+            fragment.appendChild(createTile(element));
         })
+
+        // Add tiles to DOM
         grid.appendChild(fragment);
     }
-        // Add tiles to DOM
 
-    // TODO: Remove form from screen
-
-    //TODO: On button click, prepare and display infographic
+    // On button click, prepare and display infographic
     const button = document.getElementById("btn");
 
     const prepareInfographic = () => {
         const form = document.getElementById('dino-compare');
+        // Remove form from screen
         form.style.display = 'none';
+
         generateTiles();
     }
 
