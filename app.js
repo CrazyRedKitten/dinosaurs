@@ -144,15 +144,37 @@ const dinos = [
 
     // TODO: Create Dino Compare Method 1
     // NOTE: Weight in JSON file is in lbs, height in inches. 
+    Dino.prototype.compareDiet = function (humanDiet) {
+        
+        return humanDiet === this.diet ? `${this.species} has the same diet as you!` : `
+        ${this.species} was ${this.diet === "omnivor" ? "an" : 'a'} ${this.diet}`
+        
+        };
 
-    
     // TODO: Create Dino Compare Method 2
     // NOTE: Weight in JSON file is in lbs, height in inches.
-
+    Dino.prototype.compareWeight = function (humanWeight) {
     
-    // TODO: Create Dino Compare Method 3
-    // NOTE: Weight in JSON file is in lbs, height in inches.
+        switch(humanWeight){
+            case humanWeight === this.weight:
+                return `${this.species} weight is equal to yours!`;
+            case humanWeight < this.weight:
+                return `${this.species} weight is ${this.weight / humanWeight} times bigger than yours`;
+            case humanWeight > this.weight:
+                return `${this.species} weight is ${humanWeight / this.weight} times less than yours`;
+        }
 
+    };
+
+
+    const dinoCompareMethods = {
+        // TODO: Create Dino Compare Method 3
+        // NOTE: Weight in JSON file is in lbs, height in inches.
+        compareWeight: function(){},
+    }
+
+    Dino.prototype = dinoCompareMethods;
+    
 
     /**
      * @description creates a single tile.
@@ -185,6 +207,7 @@ const dinos = [
         card.appendChild(image);
         // Generate description only for dino
         !isHuman && card.appendChild(description);
+        !isHuman && console.log(creature.compareDiet('omnivor'));
         card.classList.add('grid-item');
 
         return card;
