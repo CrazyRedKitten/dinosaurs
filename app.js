@@ -84,8 +84,8 @@ const dinos = [
      */
     function Creature(species, height, weight, diet){
         this.species = species;
-        this.height = height;
-        this.weight = weight;
+        this.height = Number.parseFloat(height);
+        this.weight = Number.parseFloat(weight);
         this.diet = diet;
     }
     
@@ -93,16 +93,14 @@ const dinos = [
     /**
      * @description represents a dinosaur object
      * @constructor
-     * @param {string} where - The place where dinosaur lived.
-     * @param {string} when - The time period in which dinosaur lived.
-     * @param {string} fact - The fact about dinosaur.
+     * @param {object} dinoData - dino object with all data.
      */
-    function Dino(species, height, weight, diet, where, when, fact){
-        Creature.call(this, species, height, weight, diet);
+    function Dino(dinoData){
+        Creature.call(this, dinoData.species, dinoData.height, dinoData.weight, dinoData.diet);
 
-        this.where = where;
-        this.when = when;
-        this.fact = fact;
+        this.where = dinoData.where;
+        this.when = dinoData.when;
+        this.fact = dinoData.fact;
     };
 
     // Create Dino Objects
@@ -112,8 +110,7 @@ const dinos = [
     let dinosArray = [];
 
     dinos.forEach(element => {
-        const {species, weight, height, diet, where, when, fact} = element;
-        dinosArray.push(new Dino(species, weight, height, diet, where, when, fact));
+        dinosArray.push(new Dino(element));
     })
 
     // Create Human Object
@@ -142,40 +139,38 @@ const dinos = [
         }
     })();
 
-    // TODO: Create Dino Compare Method 1
+    // Create Dino Compare Method 1
     // NOTE: Weight in JSON file is in lbs, height in inches. 
     Dino.prototype.compareDiet = function (humanDiet) {
-        
-        return humanDiet === this.diet ? `${this.species} has the same diet as you!` : `
-        ${this.species} was ${this.diet === "omnivor" ? "an" : 'a'} ${this.diet}`
+        return humanDiet.toLowerCase() == this.diet ? `${this.species} has the same diet as you.` : `
+        ${this.species} is ${this.diet === "omnivor" ? "an" : 'a'} ${this.diet}.`
         
         };
 
-    // TODO: Create Dino Compare Method 2
+    // Create Dino Compare Method 2
     // NOTE: Weight in JSON file is in lbs, height in inches.
     Dino.prototype.compareWeight = function (humanWeight) {
-    
-        switch(humanWeight){
-            case humanWeight === this.weight:
-                return `${this.species} weight is equal to yours!`;
-            case humanWeight < this.weight:
-                return `${this.species} weight is ${this.weight / humanWeight} times bigger than yours`;
-            case humanWeight > this.weight:
-                return `${this.species} weight is ${humanWeight / this.weight} times less than yours`;
+        if (humanWeight === this.weight) {
+            return `${this.species} weight is equal to yours.`;
+        } else if(humanWeight < this.weight){
+            return `${this.species} weight is ${Math.floor(this.weight / humanWeight)} times bigger than yours.`;
+        } else if (humanWeight > this.weight) {
+            return `${this.species} weight is ${Math.floor(humanWeight / this.weight)} times less than yours.`;
         }
-
     };
 
-
-    const dinoCompareMethods = {
-        // TODO: Create Dino Compare Method 3
-        // NOTE: Weight in JSON file is in lbs, height in inches.
-        compareWeight: function(){},
+    // Create Dino Compare Method 3
+    // NOTE: Weight in JSON file is in lbs, height in inches.
+    Dino.prototype.compareHeight = function (humanHeight) {
+        if (humanHeight === this.height) {
+            return `${this.species} height is equal to yours.`;
+        } else if(humanHeight < this.height){
+            return `${this.species} height is ${Number(this.height / humanHeight).toFixed(2)} times bigger than yours.`;
+        } else if (humanHeight > this.height) {
+            return `${this.species} height is ${Number(humanHeight / this.height).toFixed(2)} times less than yours.`;
+        }
     }
-
-    Dino.prototype = dinoCompareMethods;
     
-
     /**
      * @description creates a single tile.
      * 
@@ -200,14 +195,45 @@ const dinos = [
             return name;
         };
 
+        /**
+         * @description util function which return random fact
+        * @param {object} creature - a creature data
+        * @param {object} human - a human data
+        * @returns {string} fact - random dinos fact
+        */
+        function generateFact (creature, human) {
+            // Generate random number from 1 - 6
+            const randomNumber =  Math.floor(Math.random() * (6 - 1 + 1)) + 1;
+
+            if (creature.species == "Pigeon") {
+                return creature.fact
+            }
+
+            switch (randomNumber) {
+                case 1:
+                    return creature.compareDiet(human.diet);
+                case 2:
+                    return creature.compareWeight(human.weight);
+                case 3:
+                    return creature.compareHeight(human.height);
+                case 4:
+                    return creature.fact;
+                case 5:
+                    return `${creature.species} lived in ${creature.when}`;
+                case 6:
+                    return `${creature.species} lived in ${creature.where}`;
+                default:
+                    return "default case";
+            }
+        }
+
         image.src = `images/${imageName()}.png`;
         h3.textContent = species;
-        description.textContent = fact;
+        description.textContent = generateFact(creature, getHumanData());
         card.appendChild(h3);
         card.appendChild(image);
         // Generate description only for dino
         !isHuman && card.appendChild(description);
-        !isHuman && console.log(creature.compareDiet('omnivor'));
         card.classList.add('grid-item');
 
         return card;
